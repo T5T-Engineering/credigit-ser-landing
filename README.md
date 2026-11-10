@@ -12,8 +12,7 @@ npm run build      # static site in ./out
 npm run lint
 ```
 
-`@credigit/web-ui` is installed from the library's GitHub repo (`develop` branch). Your local git must be able to
-read that private repo (it can if you can clone it).
+`@credigit/web-ui` is installed from the library's public GitHub repo (`develop` branch). No credentials are needed.
 
 ### Picking up library changes
 
@@ -50,18 +49,7 @@ See `.env.example`:
 
 Build settings live in [`netlify.toml`](netlify.toml): `npm run build`, publish `out`, Node 22.
 
-Because the library repo is private, add these **environment variables** in Netlify (Site configuration →
-Environment variables, scope *Builds*, mark the key as secret):
-
-| Key | Value |
-|---|---|
-| `GIT_CONFIG_COUNT` | `1` |
-| `GIT_CONFIG_KEY_0` | `url.https://x-access-token:<TOKEN>@github.com/T5T-Engineering/.insteadOf` |
-| `GIT_CONFIG_VALUE_0` | `https://github.com/T5T-Engineering/` |
-
-`<TOKEN>` is a GitHub fine-grained personal access token (resource owner **T5T-Engineering**, repository
-**credigit-ser-web-component** only, permission **Contents: Read-only**). If the library repo is made public,
-these variables aren't needed.
+The library repo is public, so Netlify needs no tokens or extra environment variables to install it.
 
 ## Branches
 
