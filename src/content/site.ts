@@ -28,15 +28,18 @@ export const navLinks: NavLink[] = [
 export const demoCta = { label: "Request a demo", href: "/#demo" } as const;
 
 /**
- * Sign-in and registration live in the core application (credigit-ser-frontend), which isn't deployed yet.
- * Set NEXT_PUBLIC_APP_URL (e.g. https://app.example.com) to send these buttons to its /login and /register pages.
- * Until then they open placeholder pages on this site, so there are no broken links.
+ * Sign-in and registration live in the core application (credigit-ser-frontend).
+ * NEXT_PUBLIC_APP_URL sets its base URL per environment.
+ *
+ * TECH DEBT TD-001 (see TECH-DEBT.md): DEFAULT_APP_URL is a temporary hard-coded fallback, which breaks the
+ * "no hard-coded values" invariant. Remove it once NEXT_PUBLIC_APP_URL is configured in every environment.
  */
-const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+const DEFAULT_APP_URL = "https://credigit-app.netlify.app";
+const appUrl = (process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL).replace(/\/$/, "");
 
 export const authLinks = {
-  login: { label: "Log in", href: appUrl ? `${appUrl}/login` : "/login/" },
-  register: { label: "Register", href: appUrl ? `${appUrl}/register` : "/register/" },
+  login: { label: "Log in", href: `${appUrl}/` },
+  register: { label: "Register", href: `${appUrl}/register/` },
   /** True when the buttons point at the real application. */
   connected: Boolean(appUrl),
 } as const;
