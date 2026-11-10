@@ -26,3 +26,32 @@ export const navLinks: NavLink[] = [
 ];
 
 export const demoCta = { label: "Request a demo", href: "/#demo" } as const;
+
+/**
+ * Sign-in and registration live in the core application (credigit-ser-frontend), which isn't deployed yet.
+ * Set NEXT_PUBLIC_APP_URL (e.g. https://app.example.com) to send these buttons to its /login and /register pages.
+ * Until then they open placeholder pages on this site, so there are no broken links.
+ */
+const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+
+export const authLinks = {
+  login: { label: "Log in", href: appUrl ? `${appUrl}/login` : "/login/" },
+  register: { label: "Register", href: appUrl ? `${appUrl}/register` : "/register/" },
+  /** True when the buttons point at the real application. */
+  connected: Boolean(appUrl),
+} as const;
+
+export const authPlaceholder = {
+  login: {
+    eyebrow: "Log in",
+    title: "Sign-in is not available yet",
+    description:
+      "The Smart Enterprise Risk 360° application is not live yet. Once your institution is onboarded, you will sign in here with your named login and multi-factor authentication.",
+  },
+  register: {
+    eyebrow: "Register",
+    title: "Registration is not open yet",
+    description:
+      "Institutions are onboarded directly, and each user gets a named login set up by their institution's administrator. Request a demo and we will walk you through onboarding.",
+  },
+} as const;
