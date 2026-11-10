@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "@credigit/web-ui/styles.css";
+
+/* Scan the linked UI library (source distribution) for utility classes. */
+@source "../../node_modules/@credigit/web-ui/src";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem; /* keep anchored headings clear of the sticky navbar */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
