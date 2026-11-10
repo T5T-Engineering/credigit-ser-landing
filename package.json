@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@credigit/web-ui": "file:../credigit-ser-web-component",
+    "@credigit/web-ui": "git+https://github.com/T5T-Engineering/credigit-ser-web-component.git#develop",
     "lucide-react": "1.70.0",
     "next": "16.4.6",
     "react": "19.3.1",
