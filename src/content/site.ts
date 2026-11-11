@@ -29,17 +29,14 @@ export const demoCta = { label: "Request a demo", href: "/#demo" } as const;
 
 /**
  * Sign-in and registration live in the core application (credigit-ser-frontend).
- * NEXT_PUBLIC_APP_URL sets its base URL per environment.
- *
- * TECH DEBT TD-001 (see TECH-DEBT.md): DEFAULT_APP_URL is a temporary hard-coded fallback, which breaks the
- * "no hard-coded values" invariant. Remove it once NEXT_PUBLIC_APP_URL is configured in every environment.
+ * NEXT_PUBLIC_APP_URL sets its base URL per environment (Netlify site environment variables).
+ * When it is not set, the buttons open this site's own /login/ and /register/ placeholder pages.
  */
-const DEFAULT_APP_URL = "https://credigit-app.netlify.app";
-const appUrl = (process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL).replace(/\/$/, "");
+const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").trim().replace(/\/$/, "");
 
 export const authLinks = {
-  login: { label: "Log in", href: `${appUrl}/` },
-  register: { label: "Register", href: `${appUrl}/register/` },
+  login: { label: "Log in", href: appUrl ? `${appUrl}/` : "/login/" },
+  register: { label: "Register", href: appUrl ? `${appUrl}/register/` : "/register/" },
   /** True when the buttons point at the real application. */
   connected: Boolean(appUrl),
 } as const;
