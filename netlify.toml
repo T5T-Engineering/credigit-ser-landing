@@ -11,3 +11,6 @@
 [build.environment]
   NODE_VERSION = "22"
   NEXT_TELEMETRY_DISABLED = "1"
+  # Demo-request form goes to Netlify Forms (public/__forms.html is the detected form). Set to "json" with
+  # NEXT_PUBLIC_DEMO_REQUEST_ENDPOINT to use another receiver.
+  NEXT_PUBLIC_DEMO_REQUEST_TRANSPORT = "netlify-forms"
