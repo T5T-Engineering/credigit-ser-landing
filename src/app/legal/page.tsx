@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Alert, Band, Heading, PageHeader, Stack, Text } from "@credigit/web-ui";
+import { Alert, Band, Heading, PageHeader, Stack, Text, TextLink } from "@credigit/web-ui";
 import { legalPage } from "@/content/footer";
 
 export const metadata: Metadata = {
@@ -26,6 +26,7 @@ export default function LegalPage() {
                 {section.title}
               </Heading>
               <Text tone="muted">{section.body}</Text>
+              {section.link ? <TextLink href={section.link.href}>{section.link.label}</TextLink> : null}
             </Stack>
           ))}
         </Stack>

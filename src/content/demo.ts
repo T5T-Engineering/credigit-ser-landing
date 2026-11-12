@@ -1,3 +1,5 @@
+import { site } from "./site";
+
 export const ctaBand = {
   title: "See Smart Enterprise Risk 360° with your own workflow in mind",
   description: "Tell us about your institution and we will arrange a walkthrough.",
@@ -32,6 +34,14 @@ export const demoForm = {
     { value: "mfi", label: "Microfinance institution" },
     { value: "other", label: "Other financial institution" },
   ],
+  /** Short notice under the form (interim wording; final text from legal, SITE-Q-02). */
+  privacyNotice: {
+    text: `${site.company} uses the details you send only to respond to your demo request.`,
+    linkLabel: "Read our privacy notice",
+    href: "/privacy/",
+  },
+  /** Spam trap; hidden from people and assistive technology. */
+  honeypotLabel: "Leave this field empty",
   errors: {
     name: "Enter your full name.",
     emailRequired: "Enter your work email.",

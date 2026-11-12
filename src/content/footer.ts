@@ -32,16 +32,21 @@ export const footer = {
   ],
   legal: `© ${new Date().getFullYear()} ${site.company}. All rights reserved.`,
   bottomLinks: [
-    { label: "Privacy notice", href: "/legal/#privacy" },
+    { label: "Privacy notice", href: "/privacy/" },
     { label: "Terms of use", href: "/legal/#terms" },
   ],
 };
 
 export const legalPage = {
   title: "Legal",
-  description: "Our privacy notice and terms of use are being prepared and will be published here.",
+  description: "Our terms of use are being prepared and will be published here.",
   sections: [
-    { id: "privacy", title: "Privacy notice", body: "To be published by Credigit Analytical Limited." },
-    { id: "terms", title: "Terms of use", body: "To be published by Credigit Analytical Limited." },
-  ],
+    {
+      id: "privacy",
+      title: "Privacy notice",
+      body: "How we handle the details you send through this site is explained in our privacy notice.",
+      link: { label: "Read the privacy notice", href: "/privacy/" },
+    },
+    { id: "terms", title: "Terms of use", body: `To be published by ${site.company}.` },
+  ] as { id: string; title: string; body: string; link?: { label: string; href: string } }[],
 };

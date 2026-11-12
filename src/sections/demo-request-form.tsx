@@ -1,47 +1,50 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { Alert, Button, Card, Field, Form, FormActions, Grid, Input, Select, Textarea } from "@credigit/web-ui";
+import {
+  Alert,
+  Button,
+  Card,
+  Field,
+  Form,
+  FormActions,
+  Grid,
+  Input,
+  Select,
+  Text,
+  Textarea,
+  TextLink,
+  VisuallyHidden,
+} from "@credigit/web-ui";
 import { demoForm } from "@/content/demo";
+import {
+  buildDemoRequest,
+  demoRequestFields,
+  HONEYPOT_FIELD,
+  initialDemoRequestValues,
+  isBotSubmission,
+  resolveTransport,
+  validate,
+  type DemoRequestErrors,
+  type DemoRequestValues,
+} from "@/lib/demo-request";
 
-type Values = {
-  name: string;
-  email: string;
-  institution: string;
-  institutionType: string;
-  role: string;
-  country: string;
-  message: string;
-};
-
-type Errors = Partial<Record<keyof Values, string>>;
 type Status = "idle" | "submitting" | "success" | "error" | "not-connected";
 
-const initialValues: Values = { name: "", email: "", institution: "", institutionType: "", role: "", country: "", message: "" };
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const endpoint = process.env.NEXT_PUBLIC_DEMO_REQUEST_ENDPOINT;
+const transport = resolveTransport(process.env.NEXT_PUBLIC_DEMO_REQUEST_TRANSPORT, endpoint);
 
-function validate(values: Values): Errors {
-  const errors: Errors = {};
-  const { errors: msg } = demoForm;
-  if (!values.name.trim()) errors.name = msg.name;
-  if (!values.email.trim()) errors.email = msg.emailRequired;
-  else if (!EMAIL_PATTERN.test(values.email.trim())) errors.email = msg.emailInvalid;
-  if (!values.institution.trim()) errors.institution = msg.institution;
-  if (!values.institutionType) errors.institutionType = msg.institutionType;
-  return errors;
-}
-
-/** Demo request form. Posts JSON to NEXT_PUBLIC_DEMO_REQUEST_ENDPOINT when configured. */
+/** Demo request form. Delivers to Netlify Forms or a JSON endpoint, per NEXT_PUBLIC_DEMO_REQUEST_TRANSPORT. */
 export function DemoRequestForm() {
-  const [values, setValues] = useState<Values>(initialValues);
-  const [errors, setErrors] = useState<Errors>({});
+  const [values, setValues] = useState<DemoRequestValues>(initialDemoRequestValues);
+  const [honeypot, setHoneypot] = useState("");
+  const [errors, setErrors] = useState<DemoRequestErrors>({});
   const [status, setStatus] = useState<Status>("idle");
   const formRef = useRef<HTMLFormElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
   const { fields } = demoForm;
 
-  const update = (key: keyof Values) => (event: { target: { value: string } }) => {
+  const update = (key: keyof DemoRequestValues) => (event: { target: { value: string } }) => {
     const value = event.target.value;
     setValues((v) => ({ ...v, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
@@ -49,28 +52,32 @@ export function DemoRequestForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const found = validate(values);
+    const found = validate(values, demoForm.errors);
     setErrors(found);
-    const firstInvalid = (Object.keys(found) as (keyof Values)[])[0];
+    const firstInvalid = demoRequestFields.find((key) => found[key]);
     if (firstInvalid) {
       formRef.current?.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
       return;
     }
-    if (!endpoint) {
+    const request = buildDemoRequest(values, transport, endpoint);
+    if (!request) {
       setStatus("not-connected");
+      requestAnimationFrame(() => statusRef.current?.focus());
+      return;
+    }
+    // A filled honeypot means a bot: pretend success and send nothing.
+    if (isBotSubmission(honeypot)) {
+      setStatus("success");
+      setValues(initialDemoRequestValues);
       requestAnimationFrame(() => statusRef.current?.focus());
       return;
     }
     setStatus("submitting");
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, source: "credigit-ser-landing" }),
-      });
+      const response = await fetch(request.url, request.init);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       setStatus("success");
-      setValues(initialValues);
+      setValues(initialDemoRequestValues);
     } catch {
       setStatus("error");
     }
@@ -155,6 +162,21 @@ export function DemoRequestForm() {
         <Field label={fields.message.label} htmlFor="demo-message" description={fields.message.description} optional>
           <Textarea id="demo-message" name="message" rows={4} autoResize value={values.message} onChange={update("message")} />
         </Field>
+        <VisuallyHidden as="div" aria-hidden="true">
+          <Field label={demoForm.honeypotLabel} htmlFor="demo-bot-field">
+            <Input
+              id="demo-bot-field"
+              name={HONEYPOT_FIELD}
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(event) => setHoneypot(event.target.value)}
+            />
+          </Field>
+        </VisuallyHidden>
+        <Text variant="small">
+          {demoForm.privacyNotice.text} <TextLink href={demoForm.privacyNotice.href}>{demoForm.privacyNotice.linkLabel}</TextLink>.
+        </Text>
         <FormActions>
           <Button type="submit" variant="primary" loading={status === "submitting"}>
             {status === "submitting" ? demoForm.submittingLabel : demoForm.submitLabel}
